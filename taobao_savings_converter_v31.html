@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<title>淘宝省钱卡转链工具</title>
+<style>
+:root{color-scheme:light dark;--bg:#f7f7f8;--card:#fff;--text:#212121;--muted:#666;--line:#e1e1e5;--accent:#e95717;--soft:#fff3eb;--err:#b52626}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6}main{max-width:560px;margin:0 auto;padding:36px 18px 48px}header{margin-bottom:24px}.tag{font-size:12px;color:var(--accent);font-weight:700;letter-spacing:.08em}h1{font-size:28px;line-height:1.25;margin:8px 0 10px}p{margin:8px 0;color:var(--muted);font-size:14px}.card{border:1px solid var(--line);background:var(--card);border-radius:20px;padding:20px;margin-bottom:16px}label{display:block;font-size:14px;font-weight:650;margin-bottom:8px}textarea{display:block;width:100%;resize:vertical;min-height:132px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--text);font:inherit;font-size:16px;overflow-wrap:anywhere}textarea:focus{outline:2px solid var(--accent);outline-offset:1px}.actions{display:flex;gap:10px;margin-top:14px}.actions>*{flex:1}button,a.btn{appearance:none;border:1px solid var(--line);border-radius:12px;padding:12px 8px;font:inherit;font-size:15px;font-weight:650;cursor:pointer;text-decoration:none;text-align:center;background:var(--card);color:var(--text);min-height:48px;display:flex;align-items:center;justify-content:center}button.primary,a.primary{background:var(--accent);color:white;border-color:var(--accent)}button:disabled,a[aria-disabled=true]{opacity:.42;cursor:default;pointer-events:none}.status{min-height:24px;font-size:13px;margin-top:10px;color:var(--muted)}.status.error{color:var(--err)}.status.ok{color:#278244}.result{margin-top:16px}.result textarea{font-size:12px;min-height:88px;word-break:break-all}.secondary{font-size:13px}h2{font-size:16px;margin:0 0 9px}ol{padding-left:22px;margin:0;font-size:14px}li{margin:4px 0}details{margin-top:14px;font-size:13px;color:var(--muted)}summary{cursor:pointer}code{word-break:break-all}footer{font-size:12px;color:var(--muted);text-align:center;margin-top:20px}@media(prefers-color-scheme:dark){:root{--bg:#171719;--card:#242427;--text:#f3f3f4;--muted:#aaa;--line:#424247;--accent:#f36a2d;--soft:#39291f;--err:#ff8b8b}.status.ok{color:#77ce8a}}
+</style>
+</head>
+<body><main>
+<header><div class="tag">独立网页 · 本地处理</div><h1>淘宝省钱卡转链工具</h1><p>把普通淘宝搜索结果页的长链接转换为省钱卡搜索链接。</p></header>
+<section class="card">
+<label for="raw">普通淘宝搜索链接</label>
+<textarea id="raw" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="粘贴 https://s.m.taobao.com/h5?... 完整长链接"></textarea>
+<div id="status" class="status" role="status" aria-live="polite">JavaScript 尚未运行。如果此提示一直存在，请用真正的网页浏览器打开，不要使用文件预览。</div>
+<div class="actions"><button id="convert" class="primary" type="button">转换链接</button></div><div class="actions"><a id="open" class="btn primary" aria-disabled="true" target="_self" rel="noreferrer">打开淘宝</a><button id="copy" disabled>复制新链接</button></div>
+<div class="result" id="result" hidden><label for="output">转换后的链接</label><textarea id="output" readonly spellcheck="false"></textarea><button id="clear" style="width:100%;margin-top:10px">清空</button></div>
+</section>
+<section class="card"><h2>使用方法</h2><ol><li>在普通淘宝搜索框输入商品名称。</li><li>分享搜索结果页，复制完整长链接（不是商品详情链接或淘口令短链接）。</li><li>粘贴到上方，必要时点击转换链接，再点击打开淘宝；如未跳转，复制新链接到浏览器打开。</li><li>确认进入省钱卡搜索页，并在结算时检查红包是否可用。</li></ol>
+<details><summary>转换原理与隐私</summary><p>删除 <code>g_mainChannel</code>、<code>mainChannel</code> 及已有的渠道、广告参数，添加 <code>g_channelSrp=shengqianka_gmv_open</code> 与 <code>g_searchAdRate=0</code>。其余原始参数保持不变。</p><p>本网页无外部脚本、无统计追踪、不保存输入、不向第三方发送链接。点击打开时才访问淘宝。转换结果仍保留输入链接自身的分享及会话参数，不建议将它公开发布。工具未内置任何用户的链接或账户标识。</p><p>非淘宝官方工具；能否搜索、跳转及使用优惠取决于淘宝客户端、账户及活动规则，可能随版本更新失效。</p></details></section>
+<noscript><p>需要启用 JavaScript 才能转换链接。请在支持脚本的浏览器中打开，而不是文件预览器。</p></noscript>
+<footer>V3.1 · 方案 A · 无需登录本工具</footer>
+</main><script>
+function convert(raw){
+  const m=raw.trim().match(/https:\/\/s\.m\.taobao\.com\/h5\?[^\s<>"“”]+/i);
+  if(!m) throw new Error('请粘贴普通搜索结果页的完整长链接，不支持商品详情页或短链接。');
+  const src=m[0].replace(/[，。；、）】]+$/,'');
+  const u=new URL(src);
+  if(u.protocol!=='https:'||u.hostname!=='s.m.taobao.com'||u.port||u.username||u.password||u.pathname!=='/h5')throw new Error('不是支持的淘宝搜索链接。');
+  if(!(u.searchParams.get('q')||'').trim())throw new Error('缺少搜索关键词 q，请复制完整搜索链接。');
+  const hashAt=src.indexOf('#');
+  const noHash=hashAt<0?src:src.slice(0,hashAt);
+  const fragment=hashAt<0?'':src.slice(hashAt);
+  const idx=noHash.indexOf('?');
+  const remove=new Set(['g_mainChannel','mainChannel','g_channelSrp','g_searchAdRate']);
+  const parts=noHash.slice(idx+1).split('&').filter(p=>{if(!p)return false;const k=p.split('=',1)[0];try{return !remove.has(decodeURIComponent(k.replace(/\+/g,' ')));}catch(e){return true;}});
+  parts.push('g_channelSrp=shengqianka_gmv_open','g_searchAdRate=0');
+  return {url:'https://s.m.taobao.com/h5?'+parts.join('&')+fragment,keyword:u.searchParams.get('q')};
+}
+const raw=document.getElementById('raw'),output=document.getElementById('output'),open=document.getElementById('open'),copy=document.getElementById('copy'),result=document.getElementById('result'),status=document.getElementById('status');
+function refresh(){output.value='';open.removeAttribute('href');open.setAttribute('aria-disabled','true');copy.disabled=true;result.hidden=true;status.className='status';if(!raw.value.trim()){status.textContent='脚本已启动。粘贴后自动转换，也可以点击转换链接。';return;}try{const r=convert(raw.value);output.value=r.url;open.href=r.url;open.setAttribute('aria-disabled','false');copy.disabled=false;result.hidden=false;status.className='status ok';status.textContent='已转换：'+r.keyword;}catch(e){status.className='status error';status.textContent=e.message;}}
+raw.addEventListener('input',refresh);
+raw.addEventListener('change',refresh);
+raw.addEventListener('paste',function(){setTimeout(refresh,0);});
+document.getElementById('convert').addEventListener('click',function(){refresh();if(!raw.value.trim()){status.textContent='请先粘贴普通搜索链接。';raw.focus();}});
+document.getElementById('clear').addEventListener('click',()=>{raw.value='';refresh();raw.focus();});
+copy.addEventListener('click',async()=>{if(!output.value)return;let ok=false;try{if(navigator.clipboard && navigator.clipboard.writeText){await navigator.clipboard.writeText(output.value);ok=true;}}catch(e){}if(!ok){output.focus();output.select();output.setSelectionRange(0,output.value.length);try{ok=document.execCommand('copy');}catch(e){}}status.className='status '+(ok?'ok':'');status.textContent=ok?'已复制新链接。':'链接已选中，请长按并手动复制。';});
+refresh();
+</script></body></html>
